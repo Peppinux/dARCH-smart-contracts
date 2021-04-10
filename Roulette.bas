@@ -142,7 +142,7 @@ Function Withdraw(amount Uint64) Uint64
 21  RETURN 2
 
 30  SEND_DERO_TO_ADDRESS(SIGNER(), amount)
-40  STORE("balance", LOAD("balance") - amount)
+40  STORE("balance", LOAD("balance") - amount - 1)
 50  RETURN 0
 End Function
 
@@ -150,24 +150,24 @@ End Function
 
 Function Bet(number Uint64, amountOnNumber Uint64, amountOnRed Uint64, amountOnBlack Uint64, amountOnEven Uint64, amountOnOdd Uint64, amountOn1to18 Uint64, amountOn19to36 Uint64, amountOn1st12 Uint64, amountOn2nd12 Uint64, amountOn3rd12 Uint64, amountOnColumn1to34 Uint64, amountOnColumn2to35 Uint64, amountOnColumn3to36 Uint64) Uint64
 10  IF LOAD("bettingSuspended") == 0 THEN GOTO 20
-11  SEND_DERO_TO_ADDRESS(SIGNER(), DEROVALUE())
-12  RETURN 1
+11  SEND_DERO_TO_ADDRESS(SIGNER(), DEROVALUE()-1)
+12  RETURN 0
 
 20  IF DEROVALUE() > LOAD("minBet") THEN GOTO 30
-21  SEND_DERO_TO_ADDRESS(SIGNER(), DEROVALUE())
-22  RETURN 2
+21  SEND_DERO_TO_ADDRESS(SIGNER(), DEROVALUE()-1)
+22  RETURN 0
 
 30  IF LOAD("maxBet") == 0 THEN GOTO 40
 31  IF DEROVALUE() < LOAD("maxBet") THEN GOTO 40
-32  SEND_DERO_TO_ADDRESS(SIGNER(), DEROVALUE())
-33  RETURN 3
+32  SEND_DERO_TO_ADDRESS(SIGNER(), DEROVALUE()-1)
+33  RETURN 0
 
 40  DIM totalAmount, returnAmount, winningNumber, winnings as Uint64
 50  LET totalAmount = amountOnNumber + amountOnRed + amountOnBlack + amountOnEven + amountOnOdd + amountOn1to18 + amountOn19to36 + amountOn1st12 + amountOn2nd12 + amountOn3rd12 + amountOnColumn1to34 + amountOnColumn2to35 + amountOnColumn3to36
 
 60  IF DEROVALUE() >= totalAmount THEN GOTO 70
-61  SEND_DERO_TO_ADDRESS(SIGNER(), DEROVALUE()) // Refund SIGNER since they tried to bet more than they sent to the contract.
-62  RETURN 4
+61  SEND_DERO_TO_ADDRESS(SIGNER(), DEROVALUE()-1) // Refund SIGNER since they tried to bet more than they sent to the contract.
+62  RETURN 0
 
 70  LET returnAmount = DEROVALUE() - totalAmount // Amount of DERO that was sent to the contract but NOT bet on anything. Will be refunded to the SIGNER regardless of the outcome of the bet.
 
@@ -221,8 +221,8 @@ Function Bet(number Uint64, amountOnNumber Uint64, amountOnRed Uint64, amountOnB
 221  IF returnAmount > 0 THEN GOTO 250 ELSE GOTO 260
 
 230  IF LOAD("balance")+DEROVALUE() > winnings THEN GOTO 240
-231  SEND_DERO_TO_ADDRESS(SIGNER(), DEROVALUE()) // Refund SIGNER since the contract does not have enough funds to pay out the winnings.
-232  RETURN 5
+231  SEND_DERO_TO_ADDRESS(SIGNER(), DEROVALUE()-1) // Refund SIGNER since the contract does not have enough funds to pay out the winnings.
+232  RETURN 0
 
 240  STORE("balance", LOAD("balance")+DEROVALUE()-winnings)
 250  SEND_DERO_TO_ADDRESS(SIGNER(), winnings+returnAmount)

@@ -73,12 +73,12 @@ End Function
 
 Function Deposit() Uint64
 10  IF ADDRESS_RAW(LOAD("depositor")) == SIGNER() || LOAD("owner") == SIGNER() THEN GOTO 20
-11  SEND_DERO_TO_ADDRESS(SIGNER(), DEROVALUE())
-12  RETURN 1
+11  SEND_DERO_TO_ADDRESS(SIGNER(), DEROVALUE()-1)
+12  RETURN 0
 
 20  IF LOAD("status") == 0 THEN GOTO 30
-21  SEND_DERO_TO_ADDRESS(SIGNER(), DEROVALUE())
-22  RETURN 2
+21  SEND_DERO_TO_ADDRESS(SIGNER(), DEROVALUE()-1)
+22  RETURN 0
 
 30  STORE("balance", LOAD("balance") + DEROVALUE())
 40  RETURN 0
@@ -132,7 +132,7 @@ Function sendFunds(recipient Uint64) Uint64 // recipient: 1 = beneficiary, 2 = d
 81  LET recipientAddress = ADDRESS_RAW(LOAD("depositor"))
 
 90  SEND_DERO_TO_ADDRESS(ADDRESS_RAW(LOAD("agent")), agentFee)
-100  SEND_DERO_TO_ADDRESS(recipientAddress, funds)
+100  SEND_DERO_TO_ADDRESS(recipientAddress, funds-1)
 110  STORE("balance", 0)
 120  STORE("status", recipient)
 130  RETURN 0
